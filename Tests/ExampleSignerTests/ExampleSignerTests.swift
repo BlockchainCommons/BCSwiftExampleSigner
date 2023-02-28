@@ -31,7 +31,7 @@ final class ExampleSignerTests: XCTestCase {
         
         /// Create a message body which requests the message be signed using the ColdCard
         /// method.
-        let body = ColdCardSignatureRequestBody(message: message)
+        let body = ColdCardSignatureRequestBody(messageString: message)
         
         /// Place the body into a `TransactionRequest`. This structure includes a unique
         /// transaction ID, and optionally includes a timestamp and a human-readable note
@@ -47,7 +47,7 @@ final class ExampleSignerTests: XCTestCase {
         """
         request(CID(ab28955a)) [
             body: «"coldCardSign"» [
-                ❰"message"❱: Bytes(12)
+                ❰"message"❱: "to-be-signed"
             ]
             note: "Please sign me!"
         ]
@@ -56,7 +56,7 @@ final class ExampleSignerTests: XCTestCase {
         /// Encode the envelope as a UR. This is the actual data that would be placed into a
         /// (possibly animated) QR code.
         let requestURString = requestEnvelope.urString
-        XCTAssertEqual(requestURString, "ur:envelope/lstpsptpcstptstpsghdcxpydemdhtnlknleasjnbttiqdtilsfmgafpaotebgvlcwvlaeheeycnldclfdehjotpsptputlftpsptpurcsietpsplftpsptpcstptljziajljziefxhsjpieguiniojttpsptputlftpsptpcstptbiojnihjkjkhsioihtpsptpcsgsjyjldpidihdpjkiniojtihietpsptputlftpsptpuraatpsptpcsjlgdjzihhsjkihcxjkiniojtcxjnihcldkbeksah")
+        XCTAssertEqual(requestURString, "ur:envelope/lstpsptpcstptstpsghdcxpydemdhtnlknleasjnbttiqdtilsfmgafpaotebgvlcwvlaeheeycnldclfdehjotpsptputlftpsptpuraatpsptpcsjlgdjzihhsjkihcxjkiniojtcxjnihcltpsptputlftpsptpurcsietpsplftpsptpcstptljziajljziefxhsjpieguiniojttpsptputlftpsptpcstptbiojnihjkjkhsioihtpsptpcsjzjyjldpidihdpjkiniojtihierttplefn")
         
         /// Send the request to the signing service endpoint via a REST call or QR code.
         /// The response is sent back as a UR string.
@@ -126,14 +126,14 @@ final class ExampleSignerTests: XCTestCase {
                  f4   # false
         """)
         
-        let body = ColdCardSignatureRequestBody(message: message, path: path)
+        let body = ColdCardSignatureRequestBody(messageString: message, path: path)
         let request = TransactionRequest(id: Self.transactionID, body: body)
         let requestEnvelope = request.envelope
         XCTAssertEqual(requestEnvelope.format(context: Self.formatContext),
         """
         request(CID(ab28955a)) [
             body: «"coldCardSign"» [
-                ❰"message"❱: Bytes(12)
+                ❰"message"❱: "to-be-signed"
                 ❰"path"❱: crypto-keypath(Map)
             ]
         ]
@@ -142,7 +142,7 @@ final class ExampleSignerTests: XCTestCase {
         /// Encode the envelope as a UR. This is the actual data that would be placed into a
         /// (possibly animated) QR code.
         let requestURString = requestEnvelope.urString
-        XCTAssertEqual(requestURString, "ur:envelope/lftpsptpcstptstpsghdcxpydemdhtnlknleasjnbttiqdtilsfmgafpaotebgvlcwvlaeheeycnldclfdehjotpsptputlftpsptpurcsietpsplstpsptpcstptljziajljziefxhsjpieguiniojttpsptputlftpsptpcstptbiojnihjkjkhsioihtpsptpcsgsjyjldpidihdpjkiniojtihietpsptputlftpsptpcstptbiejohsjyistpsptpcstaaddyoyadlnchwkchykcsclwktyvdpfce")
+        XCTAssertEqual(requestURString, "ur:envelope/lftpsptpcstptstpsghdcxpydemdhtnlknleasjnbttiqdtilsfmgafpaotebgvlcwvlaeheeycnldclfdehjotpsptputlftpsptpurcsietpsplstpsptpcstptljziajljziefxhsjpieguiniojttpsptputlftpsptpcstptbiojnihjkjkhsioihtpsptpcsjzjyjldpidihdpjkiniojtihietpsptputlftpsptpcstptbiejohsjyistpsptpcstaaddyoyadlnchwkchykcsclwkdpdpynec")
         
         /// Send the request to the signing service endpoint via a REST call or QR code.
         /// The response is sent back as a UR string.
@@ -167,14 +167,14 @@ final class ExampleSignerTests: XCTestCase {
     /// allowed, so here we include five.
     func testExample3() throws {
         let message = "to-be-     signed"
-        let body = ColdCardSignatureRequestBody(message: message)
+        let body = ColdCardSignatureRequestBody(messageString: message)
         let request = TransactionRequest(id: Self.transactionID, body: body)
         let requestEnvelope = request.envelope
         XCTAssertEqual(requestEnvelope.format(context: Self.formatContext),
         """
         request(CID(ab28955a)) [
             body: «"coldCardSign"» [
-                ❰"message"❱: Bytes(17)
+                ❰"message"❱: "to-be-     signed"
             ]
         ]
         """)

@@ -19,38 +19,41 @@ public extension Parameter {
     static let path = Parameter("path")
 }
 
-/// This protocol is intended to collect all the things that every request
-/// that can be made to the signing service has in common.
-public protocol SignatureRequestBody: TransactionRequestBody {
-    var message: Data { get }
-}
-
 /// This is the body of a request to sign a message in ColdCard-compliant format.
 ///
 /// The `path` parameter is optional.
 public struct ColdCardSignatureRequestBody {
-    public let message: Data
-    public let path: DerivationPath?
-    
     public let messageString: String
+    public let path: DerivationPath?
 
+    public var message: Data {
+        messageString.utf8Data
+    }
+
+    public init(messageString: String, path: DerivationPath? = nil) {
+        self.messageString = messageString
+        self.path = path
+    }
+    
     public init(message: Data, path: DerivationPath? = nil) throws {
         /// Reject any passed-in message that is not valid UTF-8
         guard let messageString = message.utf8 else {
             throw ExampleSigner.Error.invalidMessage
         }
-        self.message = message
-        self.path = path
-        self.messageString = messageString
-    }
-    
-    public init(message: String, path: DerivationPath? = nil) {
-        try! self.init(message: message.utf8Data, path: path)
+        self.init(messageString: messageString, path: path)
     }
 }
 
-/// This extension makes `ColdCardRequestBody` compliant with the `TransactionRequestBody`
-/// protocol by declaring its function and how to encode and decode the body as an envelope.
+/// This protocol collects the things that every request that can be made to the
+/// signing service has in common. No matter how many different methods of signing
+/// this service offers, there will always be a message to sign.
+public protocol SignatureRequestBody: TransactionRequestBody {
+    var message: Data { get }
+}
+
+/// This extension conforms `ColdCardRequestBody` to `SignatureRequestBody` and
+/// `TransactionRequestBody` from which it inherits, by declaring its function
+/// identifier and how to encode and decode the body as an envelope.
 extension ColdCardSignatureRequestBody: SignatureRequestBody {
     public static var function: Function = .coldCardSign
 
@@ -68,7 +71,7 @@ extension ColdCardSignatureRequestBody: SignatureRequestBody {
         // Practically speaking, this means that if there is no `path` argument,
         // the resulting envelope will not have a `path` parameter assertion.
         try! Envelope(function: Self.function)
-            .addAssertion(.parameter(.message, value: message))
+            .addAssertion(.parameter(.message, value: messageString))
             .addAssertion(.parameter(.path, value: path))
     }
 
@@ -77,13 +80,13 @@ extension ColdCardSignatureRequestBody: SignatureRequestBody {
     public init(_ envelope: Envelope) throws {
         /// The `message` argument is required, so this line will throw an exception unless
         /// exactly one `message` parameter is present and resolves to a well-formed string.
-        let message = try envelope.extractObject(Data.self, forParameter: .message)
+        let messageString = try envelope.extractObject(String.self, forParameter: .message)
         
         /// The `path` argument is optional, so the `path` variable below will be `nil`
         /// unless exactly one `path` parameter is present and resolves to a well-formed
         /// `DerivationPath`.
         let path = try? envelope.extractObject(DerivationPath.self, forParameter: .path)
 
-        try self.init(message: message, path: path)
+        self.init(messageString: messageString, path: path)
     }
 }
