@@ -26,21 +26,9 @@ public struct ColdCardSignatureRequestBody {
     public let messageString: String
     public let path: DerivationPath?
 
-    public var message: Data {
-        messageString.utf8Data
-    }
-
     public init(messageString: String, path: DerivationPath? = nil) {
         self.messageString = messageString
         self.path = path
-    }
-    
-    public init(message: Data, path: DerivationPath? = nil) throws {
-        /// Reject any passed-in message that is not valid UTF-8
-        guard let messageString = message.utf8 else {
-            throw ExampleSigner.Error.invalidMessage
-        }
-        self.init(messageString: messageString, path: path)
     }
 }
 
@@ -56,6 +44,11 @@ public protocol SignatureRequestBody: TransactionRequestBody {
 /// identifier and how to encode and decode the body as an envelope.
 extension ColdCardSignatureRequestBody: SignatureRequestBody {
     public static var function: Function = .coldCardSign
+
+    /// The message to sign as `Data`.
+    public var message: Data {
+        messageString.utf8Data
+    }
 
     /// This method encodes the body structured as an envelope.
     ///

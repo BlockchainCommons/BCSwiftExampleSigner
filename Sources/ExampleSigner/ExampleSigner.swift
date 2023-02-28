@@ -50,7 +50,7 @@ extension ExampleSigner {
     /// It performs validation on the passed-in string, and then returns the same sort
     /// of signed message string that ColdCard would return.
     ///
-    /// ⚠️ This has *not* yet been tested for actual ColdCard compatibility.
+    /// ⚠️ This has not yet been tested for actual ColdCard compatibility.
     func coldCardSign(message: String, path: DerivationPath? = nil) throws -> String {
         /// Up to 240 characters long.
         guard message.count <= 240 else {
