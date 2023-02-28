@@ -92,8 +92,10 @@ extension ExampleSigner {
 
 extension ExampleSigner {
     /// This is the top-level request router. It takes an Envelope in UR format and
-    /// returns a response envelope, also in UR format.
-    public func handleRequest(_ urString: String) -> String {
+    /// returns a response envelope, also in UR format. This function is marked `async`
+    /// to model the asynchronous nature of a network call, although this example
+    /// performs no actual asynchronous work.
+    public func handleRequest(_ urString: String) async -> String {
         /// The transaction request ID is encoded in the UR, so we might not
         /// even get one if the UR is malformed.
         var transactionID: CID!

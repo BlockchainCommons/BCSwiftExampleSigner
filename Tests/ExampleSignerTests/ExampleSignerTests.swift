@@ -25,7 +25,7 @@ final class ExampleSignerTests: XCTestCase {
     /// In this example, a message is sent to the signing service to be signed in a
     /// ColdCard-compatible way. No `path` argument is provided, so the signer will use
     /// the master key to sign.
-    func testExample1() throws {
+    func testExample1() async throws {
         /// The message to be signed.
         let message = "to-be-signed"
         
@@ -58,9 +58,11 @@ final class ExampleSignerTests: XCTestCase {
         let requestURString = requestEnvelope.urString
         XCTAssertEqual(requestURString, "ur:envelope/lstpsptpcstptstpsghdcxpydemdhtnlknleasjnbttiqdtilsfmgafpaotebgvlcwvlaeheeycnldclfdehjotpsptputlftpsptpuraatpsptpcsjlgdjzihhsjkihcxjkiniojtcxjnihcltpsptputlftpsptpurcsietpsplftpsptpcstptljziajljziefxhsjpieguiniojttpsptputlftpsptpcstptbiojnihjkjkhsioihtpsptpcsjzjyjldpidihdpjkiniojtihierttplefn")
         
-        /// Send the request to the signing service endpoint via a REST call or QR code.
-        /// The response is sent back as a UR string.
-        let responseURString = Self.signer.handleRequest(requestURString)
+        /// Send the request to the signing service endpoint via a REST call or QR code. The
+        /// response is sent back as a UR string. `handleRequest` is an `async` call and so
+        /// is marked here with `await` in order to simulate the asynchronous nature of a
+        /// network call, although this example performs no actual asynchonous work.
+        let responseURString = await Self.signer.handleRequest(requestURString)
         
         /// Parse the UR string into an envelope.
         let response = try Envelope(urString: responseURString)
@@ -89,7 +91,7 @@ final class ExampleSignerTests: XCTestCase {
     
     /// The only difference between this and the previous example is the inclusion of a
     /// `path` argument.
-    func testExample2() throws {
+    func testExample2() async throws {
         let message = "to-be-signed"
 
         /// Note that `DerivationPath` is not a string: it is a compound type that can parse,
@@ -146,7 +148,7 @@ final class ExampleSignerTests: XCTestCase {
         
         /// Send the request to the signing service endpoint via a REST call or QR code.
         /// The response is sent back as a UR string.
-        let responseURString = Self.signer.handleRequest(requestURString)
+        let responseURString = await Self.signer.handleRequest(requestURString)
         
         /// Parse the UR string into an envelope.
         let response = try Envelope(urString: responseURString)
@@ -165,7 +167,7 @@ final class ExampleSignerTests: XCTestCase {
     /// This example shows what happens when a malformed request is included. In this
     /// case, the ColdCard rules state that only up to four consecutive spaces are
     /// allowed, so here we include five.
-    func testExample3() throws {
+    func testExample3() async throws {
         let message = "to-be-     signed"
         let body = ColdCardSignatureRequestBody(messageString: message)
         let request = TransactionRequest(id: Self.transactionID, body: body)
@@ -180,7 +182,8 @@ final class ExampleSignerTests: XCTestCase {
         """)
         
         let requestURString = requestEnvelope.urString
-        let response = try Envelope(urString: Self.signer.handleRequest(requestURString))
+        let responseURString = await Self.signer.handleRequest(requestURString)
+        let response = try Envelope(urString: responseURString)
 
         /// Instead of a `result` assertion, this envelope includes an `error` assertion.
         XCTAssertEqual(response.format(context: Self.formatContext),
