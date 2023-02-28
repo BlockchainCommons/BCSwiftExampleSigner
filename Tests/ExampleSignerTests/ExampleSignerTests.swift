@@ -54,7 +54,8 @@ final class ExampleSignerTests: XCTestCase {
         """)
 
         /// Encode the envelope as a UR. This is the actual data that would be placed into a
-        /// (possibly animated) QR code.
+        /// (possibly animated) QR code. (For efficiency, always transform URs to UPPERCASE
+        /// before actually QR encoding them.)
         let requestURString = requestEnvelope.urString
         XCTAssertEqual(requestURString, "ur:envelope/lstpsptpcstptstpsghdcxpydemdhtnlknleasjnbttiqdtilsfmgafpaotebgvlcwvlaeheeycnldclfdehjotpsptputlftpsptpuraatpsptpcsjlgdjzihhsjkihcxjkiniojtcxjnihcltpsptputlftpsptpurcsietpsplftpsptpcstptljziajljziefxhsjpieguiniojttpsptputlftpsptpcstptbiojnihjkjkhsioihtpsptpcsjzjyjldpidihdpjkiniojtihierttplefn")
         
@@ -142,7 +143,8 @@ final class ExampleSignerTests: XCTestCase {
         """)
 
         /// Encode the envelope as a UR. This is the actual data that would be placed into a
-        /// (possibly animated) QR code.
+        /// (possibly animated) QR code. (For efficiency, always transform URs to UPPERCASE
+        /// before actually QR encoding them.)
         let requestURString = requestEnvelope.urString
         XCTAssertEqual(requestURString, "ur:envelope/lftpsptpcstptstpsghdcxpydemdhtnlknleasjnbttiqdtilsfmgafpaotebgvlcwvlaeheeycnldclfdehjotpsptputlftpsptpurcsietpsplstpsptpcstptljziajljziefxhsjpieguiniojttpsptputlftpsptpcstptbiojnihjkjkhsioihtpsptpcsjzjyjldpidihdpjkiniojtihietpsptputlftpsptpcstptbiejohsjyistpsptpcstaaddyoyadlnchwkchykcsclwkdpdpynec")
         
