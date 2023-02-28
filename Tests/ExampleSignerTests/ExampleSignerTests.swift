@@ -154,7 +154,8 @@ final class ExampleSignerTests: XCTestCase {
         
         /// Parse the UR string into an envelope.
         let response = try Envelope(urString: responseURString)
-        print(response.format(context: Self.formatContext))
+
+        /// Extract the signed message.
         let signedMessage = try response.result(String.self)
         XCTAssertEqual(signedMessage,
         """
