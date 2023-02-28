@@ -38,7 +38,7 @@ final class ExampleSignerTests: XCTestCase {
         /// that, if present, should be displayed by an airgapped device before signing.
         let request = TransactionRequest(id: Self.transactionID, body: body, note: "Please sign me!")
         
-        /// Transform the request structure into an envelope. In envelope notation, Function
+        /// Transform the request structure into an envelope. In envelope notation, function
         /// identifiers are delimited by «double chevrons» and parameter identifiers are
         /// delimited by ❰single chevrons❱. These are actually a shorthand for specific CBOR
         /// tags.
