@@ -5,20 +5,20 @@ import WolfBase
 /// This is an example signing service: it receives messages and signs them with the
 /// private keys it contains.
 public struct ExampleSigner {
-    /// This is the key the service use to sign the messages it's given. It could be a
+    /// This is the key the service uses to sign the messages it's given. It could be a
     /// single key stored on an airgapped device or a database of seeds from which
     /// one will be selected by some means for each signing.
     let masterKey: HDKey
 
-    /// This is the constructor used to create the singleton instance. It stores a
-    /// single master HD key generated from the provided seed.
+    /// Creates a signer instance. It stores a single master HD key generated from the
+    /// provided seed.
     public init(seed: Seed) {
         self.masterKey = try! HDKey(seed: seed)
     }
 
-    /// This is the internal function that takes a message and signs it with a key
-    /// derived from the master key. If no derivation path is provided, then the master
-    /// key itself is used for signing.
+    /// This is the internal function that takes an arbitrary binary message and signs
+    /// it with a key derived from the master key. If no derivation path is provided,
+    /// then the master key itself is used for signing.
     func sign(message: Data, path: DerivationPath? = nil) -> Data {
         let derivedKey: HDKey
         if let path {
@@ -48,7 +48,9 @@ extension ExampleSigner {
     /// https://coldcard.com/docs/sign-text-file
     ///
     /// It performs validation on the passed-in string, and then returns the same sort
-    /// of signed message string ColdCard would return.
+    /// of signed message string that ColdCard would return.
+    ///
+    /// ⚠️ This has *not* yet been tested for actual ColdCard compatibility.
     func coldCardSign(message: String, path: DerivationPath? = nil) throws -> String {
         /// Up to 240 characters long.
         guard message.count <= 240 else {
@@ -99,7 +101,7 @@ extension ExampleSigner {
         /// The response envelope that will be returned to the caller.
         var response: Envelope!
 
-        /// An exception caught in this context will be transformed into an error envelope.
+        /// An exception thrown from this context will be transformed into an error envelope.
         do {
             /// Parse the UR into an envelope.
             let requestEnvelope = try Envelope(urString: urString)
@@ -129,7 +131,7 @@ extension ExampleSigner {
                 /// Perform the ColdCard signing, which uses the `message` string
                 /// in the request body and results in another string to be
                 /// returned to the caller.
-                let result = try coldCardSign(message: body.message)
+                let result = try coldCardSign(message: body.messageString)
                 /// Put the transaction ID and result into a response envelope.
                 response = Envelope(response: transactionID, result: result)
             default:

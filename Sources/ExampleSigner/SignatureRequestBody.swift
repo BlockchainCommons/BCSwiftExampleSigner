@@ -22,18 +22,30 @@ public extension Parameter {
 /// This protocol is intended to collect all the things that every request
 /// that can be made to the signing service has in common.
 public protocol SignatureRequestBody: TransactionRequestBody {
+    var message: Data { get }
 }
 
 /// This is the body of a request to sign a message in ColdCard-compliant format.
 ///
 /// The `path` parameter is optional.
 public struct ColdCardSignatureRequestBody {
-    public let message: String
+    public let message: Data
     public let path: DerivationPath?
+    
+    public let messageString: String
 
-    public init(message: String, path: DerivationPath? = nil) {
+    public init(message: Data, path: DerivationPath? = nil) throws {
+        /// Reject any passed-in message that is not valid UTF-8
+        guard let messageString = message.utf8 else {
+            throw ExampleSigner.Error.invalidMessage
+        }
         self.message = message
         self.path = path
+        self.messageString = messageString
+    }
+    
+    public init(message: String, path: DerivationPath? = nil) {
+        try! self.init(message: message.utf8Data, path: path)
     }
 }
 
@@ -65,13 +77,13 @@ extension ColdCardSignatureRequestBody: SignatureRequestBody {
     public init(_ envelope: Envelope) throws {
         /// The `message` argument is required, so this line will throw an exception unless
         /// exactly one `message` parameter is present and resolves to a well-formed string.
-        let message = try envelope.extractObject(String.self, forParameter: .message)
-
+        let message = try envelope.extractObject(Data.self, forParameter: .message)
+        
         /// The `path` argument is optional, so the `path` variable below will be `nil`
         /// unless exactly one `path` parameter is present and resolves to a well-formed
         /// `DerivationPath`.
         let path = try? envelope.extractObject(DerivationPath.self, forParameter: .path)
 
-        self.init(message: message, path: path)
+        try self.init(message: message, path: path)
     }
 }

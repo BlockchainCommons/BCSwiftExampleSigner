@@ -47,7 +47,7 @@ final class ExampleSignerTests: XCTestCase {
         """
         request(CID(ab28955a)) [
             body: «"coldCardSign"» [
-                ❰"message"❱: "to-be-signed"
+                ❰"message"❱: Bytes(12)
             ]
             note: "Please sign me!"
         ]
@@ -56,7 +56,7 @@ final class ExampleSignerTests: XCTestCase {
         /// Encode the envelope as a UR. This is the actual data that would be placed into a
         /// (possibly animated) QR code.
         let requestURString = requestEnvelope.urString
-        XCTAssertEqual(requestURString, "ur:envelope/lstpsptpcstptstpsghdcxpydemdhtnlknleasjnbttiqdtilsfmgafpaotebgvlcwvlaeheeycnldclfdehjotpsptputlftpsptpuraatpsptpcsjlgdjzihhsjkihcxjkiniojtcxjnihcltpsptputlftpsptpurcsietpsplftpsptpcstptljziajljziefxhsjpieguiniojttpsptputlftpsptpcstptbiojnihjkjkhsioihtpsptpcsjzjyjldpidihdpjkiniojtihierttplefn")
+        XCTAssertEqual(requestURString, "ur:envelope/lstpsptpcstptstpsghdcxpydemdhtnlknleasjnbttiqdtilsfmgafpaotebgvlcwvlaeheeycnldclfdehjotpsptputlftpsptpurcsietpsplftpsptpcstptljziajljziefxhsjpieguiniojttpsptputlftpsptpcstptbiojnihjkjkhsioihtpsptpcsgsjyjldpidihdpjkiniojtihietpsptputlftpsptpuraatpsptpcsjlgdjzihhsjkihcxjkiniojtcxjnihcldkbeksah")
         
         /// Send the request to the signing service endpoint via a REST call or QR code.
         /// The response is sent back as a UR string.
@@ -92,7 +92,7 @@ final class ExampleSignerTests: XCTestCase {
     func testExample2() throws {
         let message = "to-be-signed"
 
-        /// Note that `DerivationPath` is not a string: it is a compound type can parse,
+        /// Note that `DerivationPath` is not a string: it is a compound type that can parse,
         /// validate and output path strings, and contains a sequence of `DerivationSteps`
         /// that make for easy handling of the path in code, including ranges and wildcards.
         /// It also conforms to `CBORTaggedCodable`, and therefore seamlessly integrates
@@ -133,7 +133,7 @@ final class ExampleSignerTests: XCTestCase {
         """
         request(CID(ab28955a)) [
             body: «"coldCardSign"» [
-                ❰"message"❱: "to-be-signed"
+                ❰"message"❱: Bytes(12)
                 ❰"path"❱: crypto-keypath(Map)
             ]
         ]
@@ -142,7 +142,7 @@ final class ExampleSignerTests: XCTestCase {
         /// Encode the envelope as a UR. This is the actual data that would be placed into a
         /// (possibly animated) QR code.
         let requestURString = requestEnvelope.urString
-        XCTAssertEqual(requestURString, "ur:envelope/lftpsptpcstptstpsghdcxpydemdhtnlknleasjnbttiqdtilsfmgafpaotebgvlcwvlaeheeycnldclfdehjotpsptputlftpsptpurcsietpsplstpsptpcstptljziajljziefxhsjpieguiniojttpsptputlftpsptpcstptbiojnihjkjkhsioihtpsptpcsjzjyjldpidihdpjkiniojtihietpsptputlftpsptpcstptbiejohsjyistpsptpcstaaddyoyadlnchwkchykcsclwkdpdpynec")
+        XCTAssertEqual(requestURString, "ur:envelope/lftpsptpcstptstpsghdcxpydemdhtnlknleasjnbttiqdtilsfmgafpaotebgvlcwvlaeheeycnldclfdehjotpsptputlftpsptpurcsietpsplstpsptpcstptljziajljziefxhsjpieguiniojttpsptputlftpsptpcstptbiojnihjkjkhsioihtpsptpcsgsjyjldpidihdpjkiniojtihietpsptputlftpsptpcstptbiejohsjyistpsptpcstaaddyoyadlnchwkchykcsclwktyvdpfce")
         
         /// Send the request to the signing service endpoint via a REST call or QR code.
         /// The response is sent back as a UR string.
@@ -150,6 +150,7 @@ final class ExampleSignerTests: XCTestCase {
         
         /// Parse the UR string into an envelope.
         let response = try Envelope(urString: responseURString)
+        print(response.format(context: Self.formatContext))
         let signedMessage = try response.result(String.self)
         XCTAssertEqual(signedMessage,
         """
@@ -173,7 +174,7 @@ final class ExampleSignerTests: XCTestCase {
         """
         request(CID(ab28955a)) [
             body: «"coldCardSign"» [
-                ❰"message"❱: "to-be-     signed"
+                ❰"message"❱: Bytes(17)
             ]
         ]
         """)
