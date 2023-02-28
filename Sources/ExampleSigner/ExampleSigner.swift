@@ -65,7 +65,7 @@ extension ExampleSigner {
         }
 
         /// No more than 4 consecutive spaces
-        guard !message.contains(try Regex(" {5}")) else {
+        guard !message.contains(try! Regex(" {5}")) else {
             throw Error.invalidMessage
         }
 
